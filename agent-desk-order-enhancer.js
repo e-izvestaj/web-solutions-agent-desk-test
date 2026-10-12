@@ -30,18 +30,26 @@ if(params.get('admin')==='1'){
  const css=()=>{
   if(document.getElementById('rmc-agent-order-css'))return;
   const style=document.createElement('style');style.id='rmc-agent-order-css';style.textContent=`
+   .rmc-agent-module-editor{display:flex!important;flex-direction:column!important}
+   .rmc-agent-module-editor>h4{order:-10000}
+   .rmc-agent-order-status{order:-9999;display:block;min-height:18px;margin:-5px 0 10px;color:#5a6b7f}
+   .rmc-agent-order-status[data-error="1"]{color:#a12a2a}
    .rmc-agent-order-controls{display:flex;gap:6px;justify-content:flex-end;margin:-46px 46px 10px 0;position:relative;z-index:2;pointer-events:none}
    .rmc-agent-order-controls button{pointer-events:auto;width:34px;height:32px;border:1px solid #ccd7e4;border-radius:8px;background:#fff;color:#17304f;font-weight:900;cursor:pointer}
    .rmc-agent-order-controls button:disabled{opacity:.28;cursor:not-allowed}
-   .rmc-agent-order-status{display:block;min-height:18px;margin:-5px 0 10px;color:#5a6b7f}.rmc-agent-order-status[data-error="1"]{color:#a12a2a}
   `;document.head.append(style);
  };
  const arrange=()=>{
   const host=editor();if(!host)return;
-  const order=normalize(savedOrder),map=new Map(sections().map(section=>[moduleId(section),section]));
-  for(const id of order){const section=map.get(id);if(section)host.append(section);}
+  const order=normalize(savedOrder),all=sections();
+  let fixedIndex=0;
+  for(const section of all){
+   const id=moduleId(section);
+   if(defaults.includes(id))section.style.order=String(100+Math.max(0,order.indexOf(id)));
+   else section.style.order=String(fixedIndex++);
+  }
   const current=normalize(savedOrder);
-  for(const section of sections()){
+  for(const section of all){
    const id=moduleId(section);if(!defaults.includes(id))continue;
    let controls=section.querySelector(':scope > .rmc-agent-order-controls');
    if(!controls){controls=document.createElement('div');controls.className='rmc-agent-order-controls';controls.innerHTML='<button type="button" data-move="-1" aria-label="Pomeri modul gore">↑</button><button type="button" data-move="1" aria-label="Pomeri modul dole">↓</button>';section.querySelector(':scope > button')?.after(controls);}
@@ -68,8 +76,8 @@ if(params.get('admin')==='1'){
   const id=siteId();if(!id||!token()||working)return;
   working=true;savedOrder=next;arrange();status('Čuvam redosled…');
   try{
-   const response=await fetch(apiUrl(`/api/admin/projects/${encodeURIComponent(id)}/module-order`),{method:'PUT',headers:{Authorization:`Bearer ${token()}`,'Content-Type':'application/json'},body:JSON.stringify({moduleOrder:next})}),data=await response.json();
-   if(!response.ok)throw new Error(data.error||'Redosled modula nije sačuvan.');
+   const response=await fetch(apiUrl(`/api/admin/projects/${encodeURIComponent(id)}/module-order`),{method:'PUT',headers:{Authorization:`Bearer ${token()}`,'Content-Type':'application/json'},body:JSON.stringify({moduleOrder:next})}),data=await response.json().catch(()=>({}));
+   if(!response.ok)throw new Error(data.error||`Redosled modula nije sačuvan (${response.status}).`);
    savedOrder=data.project?.siteConfig?.presentation?.moduleOrder||next;status('Redosled je sačuvan.');arrange();refreshPreview();
   }catch(error){status(error.message,true);}finally{working=false;arrange();}
  };
