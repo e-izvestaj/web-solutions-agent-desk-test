@@ -1,0 +1,29 @@
+name: Deploy V48.7 Agent Desk QA once
+
+on:
+  push:
+    paths: ['.github/workflows/qa-deploy-once-v487.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download tested QA build
+        env:
+          BUILD_URL: 'https://sdmntprnortheu.oaiusercontent.com/files/00000000-b854-81f4-a275-61b6674525c1/raw?se=2026-10-13T10%3A17%3A56Z&sp=r&sv=2026-02-06&sr=b&scid=6bc5bdaa-8935-55c8-9ac3-5a57668c91bc&skoid=9b41a688-1b44-4731-856e-b0efcf3660ed&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-13T03%3A59%3A40Z&ske=2026-10-14T03%3A59%3A40Z&sks=b&skv=2026-02-06&sig=hzOg7gDV6J/k9iciauI5dXwE6egTMh6B7IJp8WPY18Q%3D'
+        run: |
+          curl -L --fail "$BUILD_URL" -o build.zip
+          unzip -q -o build.zip index.html assets/index-BofW7Vh7.js assets/index-BGUc7lEu.css -d .
+          rm build.zip
+      - name: Commit QA bundle and remove one-shot workflow
+        run: |
+          git config user.name "e-izvestaj"
+          git config user.email "dragan@retailmediacenter.com"
+          rm .github/workflows/qa-deploy-once-v487.yml
+          git add index.html assets/index-BofW7Vh7.js assets/index-BGUc7lEu.css .github/workflows/qa-deploy-once-v487.yml
+          git commit -m "Deploy V48.7 Agent Desk QA bundle"
+          git push
