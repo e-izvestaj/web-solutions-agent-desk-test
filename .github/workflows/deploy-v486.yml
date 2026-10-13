@@ -1,0 +1,37 @@
+name: Deploy V48.6 Booking form builder QA
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/deploy-v486.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download tested V48.6 shell
+        run: |
+          curl --fail --location --retry 2 'https://sdmntprdenmarkeast.oaiusercontent.com/files/00000000-552c-8210-a79a-c795578ffc15/raw?se=2026-10-13T09%3A11%3A42Z&sp=r&sv=2026-02-06&sr=b&scid=e14b45bd-34d6-5611-94aa-84d58a990da5&skoid=9b41a688-1b44-4731-856e-b0efcf3660ed&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-13T04%3A25%3A30Z&ske=2026-10-14T04%3A25%3A30Z&sks=b&skv=2026-02-06&sig=FUuPvqC50k/fRTWfRgtw8MhWwZvqw4bTPiFrD9YRDpc%3D' -o /tmp/v486.zip
+          rm -rf /tmp/v486 && mkdir -p /tmp/v486
+          unzip -q /tmp/v486.zip -d /tmp/v486
+      - name: Install tested frontend shell
+        run: |
+          cp /tmp/v486/index.html ./index.html
+          mkdir -p assets
+          cp /tmp/v486/assets/index-BDQ1hBzg.js assets/index-BDQ1hBzg.js
+          cp /tmp/v486/assets/index-BGUc7lEu.css assets/index-BGUc7lEu.css
+          rm -f booking-editor-cleanup.js
+          touch .nojekyll
+      - name: Commit deployment and remove transfer workflow
+        run: |
+          git config user.name "e-izvestaj"
+          git config user.email "dragan@retailmediacenter.com"
+          git rm .github/workflows/deploy-v486.yml
+          git add index.html assets/index-BDQ1hBzg.js assets/index-BGUc7lEu.css .nojekyll
+          git add -u booking-editor-cleanup.js || true
+          git commit -m "Deploy V48.6 Booking form builder"
+          git push origin main
