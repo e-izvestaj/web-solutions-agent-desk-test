@@ -1,0 +1,46 @@
+name: Deploy staging-bound Agent Desk QA build
+
+on:
+  push:
+    paths:
+      - '.github/workflows/qa-deploy-staging-api-fix.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout QA repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download verified staging-bound client build
+        env:
+          BUILD_URL: 'https://sdmntprdenmarkeast.oaiusercontent.com/files/00000000-25b8-8210-9fbc-74c53dad0b9a/raw?se=2026-10-13T18%3A17%3A11Z&sp=r&sv=2026-02-06&sr=b&scid=32761744-56b2-508e-a305-e7e0e82d695b&skoid=9b41a688-1b44-4731-856e-b0efcf3660ed&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-10-13T02%3A20%3A58Z&ske=2026-10-14T02%3A20%3A58Z&sks=b&skv=2026-02-06&sig=cy00/RmBvSRN5HVdV9y1yJJuXyLdYBpGeAObnSCjr/M%3D'
+        run: |
+          curl -L --fail "$BUILD_URL" -o /tmp/qa-build.zip
+          rm -rf /tmp/qa-build && mkdir -p /tmp/qa-build
+          unzip -q /tmp/qa-build.zip -d /tmp/qa-build
+          rsync -a --delete --exclude='.git' --exclude='.github' /tmp/qa-build/ ./
+
+      - name: Verify staging API and latest Agent Desk controls
+        run: |
+          JS_FILE=$(grep -o '/web-solutions-agent-desk-test/assets/index-[^" ]*\.js' index.html | head -n1 | sed 's#^/web-solutions-agent-desk-test/##')
+          test -n "$JS_FILE"
+          test -f "$JS_FILE"
+          grep -q 'https://rmc-web-solutions-api-staging.onrender.com' "$JS_FILE"
+          grep -q 'Forma za porudžbinu' "$JS_FILE"
+          grep -q 'Ukloni kategoriju' "$JS_FILE"
+          grep -q 'Ukloni artikal' "$JS_FILE"
+
+      - name: Commit QA deployment and remove one-shot workflow
+        run: |
+          git config user.name "e-izvestaj"
+          git config user.email "dragan@retailmediacenter.com"
+          rm -f .github/workflows/qa-deploy-staging-api-fix.yml
+          git add -A
+          git commit -m "Deploy Agent Desk QA with staging API binding"
+          git push
