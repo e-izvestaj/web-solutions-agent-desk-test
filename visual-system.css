@@ -63,3 +63,30 @@ html[data-style="traditional"] .site-section[data-reveal]{opacity:1!important;tr
  .site-header .brandmark{max-width:calc(100% - 140px)}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+/* V48.7.1 structured-module style parity */
+/* Legacy structured/system modules used fixed light surfaces. These higher-specificity rules keep all site-facing UI on the five-style token system while leaving dialogs/demo badge as system UI. */
+html[data-style] .ws-location-section{background:var(--section-bg);color:var(--ink)}
+html[data-style] .ws-location-section h2,html[data-style] .ws-place h3{color:var(--ink);font-family:var(--display-font)}
+html[data-style] .ws-place{background:var(--surface);border-color:var(--line);border-radius:var(--radius);color:var(--ink)}
+html[data-style] .ws-place p,html[data-style] .ws-map-hint{color:var(--muted)}
+html[data-style] .ws-map-load{background:var(--accent);border-color:var(--accent);color:var(--on-accent);border-radius:var(--button-radius);font-family:var(--body-font)}
+html[data-style] .ws-map-load:hover{filter:brightness(.96)}
+html[data-style] .ws-map-load:focus-visible{outline:3px solid color-mix(in srgb,var(--accent) 48%,transparent);outline-offset:3px}
+html[data-style] .ws-contact-link,html[data-style] .ws-directions{background:var(--surface);border-color:var(--line);color:var(--ink);border-radius:var(--button-radius)}
+html[data-style] .ws-header-call{background:var(--accent);color:var(--on-accent);border-radius:var(--button-radius)}
+html[data-style] .ws-structured-grid article,html[data-style] .ws-trust-counter-strip article,html[data-style] .ws-reference-slider article,html[data-style] .ws-team-card{background:var(--surface);border-color:var(--line);color:var(--ink);border-radius:var(--radius)}
+html[data-style] .ws-trust-counter-strip article{border-top-color:var(--accent)}
+html[data-style] .ws-trust-counter-strip h3,html[data-style] .ws-reference-slider h3,html[data-style] .ws-team-card h3{color:var(--ink)}
+html[data-style] .ws-reference-slider img,html[data-style] .ws-reference-logo-empty{background:var(--surface2);color:var(--muted)}
+html[data-style] .ws-document-thumb,html[data-style] .ws-document-thumb img{background:var(--surface);border-color:var(--line);border-radius:var(--radius)}
+html[data-style] .ws-portfolio-gallery a,html[data-style] .ws-portfolio-gallery button{background:var(--surface);border-radius:var(--radius)}
+html[data-style] .ws-editor-form input,html[data-style] .ws-editor-form textarea,html[data-style] .ws-editor-form select{background:var(--surface);color:var(--ink);border-color:var(--line);border-radius:var(--button-radius)}
+html[data-style] .ws-editor-form input::placeholder,html[data-style] .ws-editor-form textarea::placeholder{color:var(--muted)}
+html[data-style] .hybrid-section{background:var(--surface);color:var(--ink)}
+html[data-style] .hybrid-request{background:var(--section-bg);border-color:var(--line);color:var(--ink);border-radius:var(--radius)}
+html[data-style] .hybrid-form input,html[data-style] .hybrid-form select,html[data-style] .hybrid-form textarea,html[data-style] .vehicle-toolbar input,html[data-style] .vehicle-toolbar select{background:var(--surface);color:var(--ink);border-color:var(--line);border-radius:var(--button-radius)}
+html[data-style] .vehicle-disclaimer{background:var(--surface2);color:var(--ink);border-left-color:var(--accent)}
+html[data-style] .vehicle-card .vehicle-photo span{background:var(--surface2);color:var(--ink);border:1px solid var(--line)}
+html[data-style] .service-mobile-cta{color:var(--on-accent)}
+html[data-style="tech"] .ws-place,html[data-style="premium"] .ws-place,html[data-style="tech"] .ws-trust-counter-strip article,html[data-style="premium"] .ws-trust-counter-strip article{box-shadow:none}
