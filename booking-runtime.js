@@ -90,9 +90,10 @@ form.addEventListener('submit',async e=>{
    ...keys.filter(k=>String(entry[k]||'').trim()).map(k=>names[k]+': '+String(entry[k]).trim()),
    site.booking?.enabled?'Molim vas da potvrdite da li je željeni termin dostupan.':'Molim vas da mi odgovorite kada budete u mogućnosti.'].join('\n');
  if(site.booking?.enabled){
-  // A preview has no siteId by design. Never create a pairing or claim a live send.
-  if(!apiBooking&&!site.bookingManager?.token){setApiState('preview');showDialog();return;}
-  if(!apiBooking){ /* explicitly selected historical V43.2 fallback below */ } else {
+  // Portal demos stay non-sending until activated. Manual mode deliberately
+  // falls through to WhatsApp/Viber/Copy so a plain exported ZIP works alone.
+  if(!apiBooking&&!site.bookingManager?.token&&site.formTransport!=='manual'){setApiState('preview');showDialog();return;}
+  if(!apiBooking){ /* manual or explicitly selected historical V43.2 fallback below */ } else {
   const timingMode=site.booking?.timingMode||(site.booking?.mode==='request-slot'?'DAY_PART':'EXACT_TIME');
   if(!entry.date||(timingMode==='EXACT_TIME'&&!entry.time)||(timingMode==='DAY_PART'&&!entry.daypart)){setApiState('error',{error:timingMode==='DAY_PART'?'Izaberite datum i željeno doba dana.':'Za slanje rezervacije izaberite datum i vreme.'});showDialog();return;}
   const extra=keys.filter(k=>!['service','date','time','daypart','name','phone'].includes(k)&&String(entry[k]||'').trim()).map(k=>names[k]+': '+entry[k]).join('; ');

@@ -1,4 +1,4 @@
-/* V41.8 sector-specific enquiry UX. Preview and standalone export use identical JS. */
+/* V48.1 service-card CTA fix. Preview and standalone export use identical JS. */
 (()=>{'use strict';
 const tag=document.getElementById('verticalData');if(!tag)return;
 let site;try{site=JSON.parse(tag.textContent)}catch{return;}
@@ -7,15 +7,23 @@ const $=id=>document.getElementById(id);
 function today(){const d=new Date();return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
 for(const el of form.querySelectorAll('input[type="date"]'))el.min=today();
 for(const el of form.querySelectorAll('input[type="month"]'))el.min=today().slice(0,7);
-function jump(node){if(!node)return;const header=document.querySelector('.site-header')?.offsetHeight||0;const top=window.scrollY+node.getBoundingClientRect().top-header-15;window.scrollTo({top:Math.max(0,top),behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}
+function jump(node){
+ if(!node)return;
+ const scroller=document.scrollingElement||document.documentElement;
+ const header=document.querySelector('.site-header')?.getBoundingClientRect().height||0;
+ const top=Math.max(0,scroller.scrollTop+node.getBoundingClientRect().top-header-15);
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ try{scroller.scrollTo({top,behavior:reduced?'auto':'smooth'})}catch{window.scrollTo(0,top)}
+}
 document.addEventListener('click',e=>{
- const a=e.target.closest('a[href^="#"]');if(a){const n=document.getElementById(a.getAttribute('href').slice(1));if(n){e.preventDefault();
-  const selection=a.dataset.verticalItem;const picker=form.elements.namedItem('item');if(selection&&picker&&[...picker.options].some(x=>x.value===selection))picker.value=selection;
+ const target=e.target instanceof Element?e.target:e.target?.parentElement;
+ const a=target?.closest?.('a[href^="#"]');if(a){const id=(a.getAttribute('href')||'').slice(1);const n=id?document.getElementById(id):null;if(n){e.preventDefault();
+  const selection=a.dataset.verticalItem;const picker=form.elements.namedItem('item');if(selection&&picker&&picker.options&&[...picker.options].some(x=>x.value===selection)){picker.value=selection;picker.dispatchEvent(new Event('change',{bubbles:true}))}
   jump(n);return;
  }}
- if(e.target.closest('#verticalClose'))dialog.close();
- if(e.target.closest('#verticalCopy'))void copyMessage();
- if(e.target.closest('#verticalViber'))void copyMessage();
+ if(target?.closest?.('#verticalClose'))dialog.close();
+ if(target?.closest?.('#verticalCopy'))void copyMessage();
+ if(target?.closest?.('#verticalViber'))void copyMessage();
 });
 const search=$('verticalSearch');if(search)search.addEventListener('input',()=>{
  const q=search.value.toLocaleLowerCase('sr').trim();let visible=0;

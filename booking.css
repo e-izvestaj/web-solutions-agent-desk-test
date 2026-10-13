@@ -38,6 +38,7 @@
 .booking-submit-dialog{overflow:hidden}
 .booking-submit-state{min-height:250px;display:grid;align-content:center;gap:14px;text-align:center}
 .booking-submit-state section{display:grid;justify-items:center;gap:11px}
+.booking-submit-state section[hidden]{display:none}
 .booking-submit-state h2{font-size:clamp(1.45rem,5vw,2rem)}
 .booking-submit-state p{margin:0;max-width:430px;line-height:1.55}
 .booking-code-label{font-size:13px;font-weight:800;color:var(--muted)}

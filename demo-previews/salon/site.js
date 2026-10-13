@@ -1,1 +1,0 @@
-(()=>{DemoUI.bindRequest(document.querySelector('#bookingForm'),d=>`Pozdrav, želeo/la bih termin u salonu. Usluga: ${d.get('service')}. Datum: ${d.get('date')}. Vreme: ${d.get('time')}. Ime: ${d.get('name')}. Telefon: ${d.get('phone')}.`);})();
